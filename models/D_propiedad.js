@@ -4,37 +4,32 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   class Propiedad extends Model {
     static associate(models) {
-      // Una propiedad pertenece a un arrendador
       Propiedad.belongsTo(models.Arrendador, { 
-        foreignKey: 'arrendador_id', 
+        foreignKey: 'arrendador_uid',  // 👈 Nombre más descriptivo
         as: 'arrendador',
         onDelete: 'CASCADE'
       });
 
-      // Una propiedad puede tener muchas características
-      Propiedad.hasMany(models.CaracteristicaPropiedad, { 
-        foreignKey: 'propiedad_id', 
+      Propiedad.hasMany(models.CaracteristicaPropiedad, {
+        foreignKey: 'propiedad_id',
         as: 'caracteristicas',
         onDelete: 'CASCADE'
       });
 
-      // Una propiedad puede estar en muchas publicaciones (habitaciones)
-      Propiedad.hasMany(models.Publicacion, { 
-        foreignKey: 'propiedad_id', 
+      Propiedad.hasMany(models.Publicacion, {
+        foreignKey: 'propiedad_id',
         as: 'publicaciones',
         onDelete: 'CASCADE'
       });
 
-      // Una propiedad puede tener muchas reservas
-      Propiedad.hasMany(models.Reserva, { 
-        foreignKey: 'propiedad_id', 
+      Propiedad.hasMany(models.Reserva, {
+        foreignKey: 'propiedad_id',
         as: 'reservas',
         onDelete: 'CASCADE'
       });
 
-      // Una propiedad puede tener muchas citas
-      Propiedad.hasMany(models.Cita, { 
-        foreignKey: 'propiedad_id', 
+      Propiedad.hasMany(models.Cita, {
+        foreignKey: 'propiedad_id',
         as: 'citas',
         onDelete: 'CASCADE'
       });
@@ -44,22 +39,25 @@ module.exports = (sequelize) => {
   Propiedad.init({
     propiedad_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
+      allowNull: false
     },
-    arrendador_id: {  // Clave foránea actualizada
-      type: DataTypes.STRING,
+    arrendador_uid: { 
+      type: DataTypes.STRING(28), // 👈 Debe coincidir con Arrendador.uid
       allowNull: false,
       references: {
-        model: 'arrendador',  // Referencia a la tabla correcta
-        key: 'uid'  // Coincide con la PK de Arrendador
+        model: 'arrendadores',
+        key: 'uid'
       },
       onDelete: 'CASCADE'
     },
     direccion: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
     },
     descripcion: {
       type: DataTypes.TEXT,
@@ -67,7 +65,10 @@ module.exports = (sequelize) => {
     },
     precio: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        min: 0  // Precio no puede ser negativo
+      }
     },
     estado: {
       type: DataTypes.ENUM('disponible', 'ocupada', 'mantenimiento'),
@@ -77,10 +78,12 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Propiedad',
+    tableName: 'propiedades',
     freezeTableName: true,
-    tableName: 'Propiedades',  // Nombre de tabla en snake_case
-    timestamps: false  // Si no usas los timestamps automáticos
+    timestamps: false
   });
 
   return Propiedad;
 };
+
+

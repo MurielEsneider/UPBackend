@@ -1,7 +1,7 @@
 const { Pago } = require('../models');
 
 // Obtener todos los pagos
-exports.getAllPagos = async (req, res) => {
+const getAllPagos = async (req, res) => {
   try {
     const pagos = await Pago.findAll();
     res.json(pagos);
@@ -11,7 +11,7 @@ exports.getAllPagos = async (req, res) => {
 };
 
 // Obtener un pago por ID
-exports.getPagoById = async (req, res) => {
+const getPagoById = async (req, res) => {
   try {
     const pago = await Pago.findByPk(req.params.id);
     if (!pago) return res.status(404).json({ error: 'Pago no encontrado' });
@@ -22,7 +22,7 @@ exports.getPagoById = async (req, res) => {
 };
 
 // Crear un nuevo pago
-exports.createPago = async (req, res) => {
+const createPago = async (req, res) => {
   try {
     const pago = await Pago.create(req.body);
     res.status(201).json(pago);
@@ -32,7 +32,7 @@ exports.createPago = async (req, res) => {
 };
 
 // Actualizar un pago
-exports.updatePago = async (req, res) => {
+const updatePago = async (req, res) => {
   try {
     const pago = await Pago.findByPk(req.params.id);
     if (!pago) return res.status(404).json({ error: 'Pago no encontrado' });
@@ -45,7 +45,7 @@ exports.updatePago = async (req, res) => {
 };
 
 // Eliminar un pago
-exports.deletePago = async (req, res) => {
+const deletePago = async (req, res) => {
   try {
     const pago = await Pago.findByPk(req.params.id);
     if (!pago) return res.status(404).json({ error: 'Pago no encontrado' });
@@ -55,4 +55,12 @@ exports.deletePago = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+module.exports = {
+  getAllPagos,
+  getPagoById,
+  createPago,
+  updatePago,
+  deletePago
 };

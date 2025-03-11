@@ -4,17 +4,16 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   class Publicacion extends Model {
     static associate(models) {
-      // Relación con Propiedad (CORREGIDO)
       Publicacion.belongsTo(models.Propiedad, {
         foreignKey: 'propiedad_id',
         as: 'propiedad',
         onDelete: 'CASCADE'
       });
 
-      // Relación N:M con Usuario (AJUSTAR NOMBRE TABLA PIVOTE)
       Publicacion.belongsToMany(models.Usuario, {
-        through: 'publicaciones_guardadas',  // Nombre de tabla en snake_case
+        through: 'publicaciones_guardadas',
         foreignKey: 'publicacion_id',
+        otherKey: 'usuario_id',  // 👈 Clave faltante
         as: 'usuariosGuardaron'
       });
     }
@@ -23,26 +22,41 @@ module.exports = (sequelize) => {
   Publicacion.init({
     publicacion_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
+      allowNull: false
     },
     propiedad_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'propiedades',  // CORRECTO: Nombre de tabla en plural
+        model: 'propiedades',  // 👈 Tabla corregida
         key: 'propiedad_id'
       },
       onDelete: 'CASCADE'
     },
-    // ... (otros campos se mantienen igual)
+    titulo: {  // 👈 Campos faltantes en el modelo
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    descripcion: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    fecha_publicacion: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    }
   }, {
     sequelize,
     modelName: 'Publicacion',
+    tableName: 'publicaciones',
     freezeTableName: true,
-    tableName: 'Publicaciones',  // CORREGIDO: Nombre en plural y snake_case
-    timestamps: false
+    timestamps: false  // Coincide con fecha_publicacion personalizada
   });
 
   return Publicacion;

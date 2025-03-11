@@ -2,18 +2,18 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('propiedad', {
+    await queryInterface.createTable('propiedades', {
       propiedad_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
       },
-      arrendador_id: {  // Cambiado de usuario_id a arrendador_id
-        type: Sequelize.STRING,
+      arrendador_uid: {  // 👈 Nombre actualizado
+        type: Sequelize.STRING(28),  // Longitud exacta
         allowNull: false,
         references: {
-          model: 'arrendadores',  // Referencia a la tabla de arrendadores
+          model: 'arrendadores',
           key: 'uid'
         },
         onDelete: 'CASCADE'
@@ -28,7 +28,10 @@ module.exports = {
       },
       precio: {
         type: Sequelize.DECIMAL(10, 2),
-        allowNull: false
+        allowNull: false,
+        validate: {
+          min: 0
+        }
       },
       estado: {
         type: Sequelize.ENUM('disponible', 'ocupada', 'mantenimiento'),
@@ -37,10 +40,13 @@ module.exports = {
       }
     });
 
-    await queryInterface.addIndex('propiedad', ['arrendador_id']);
+    // Índices para búsquedas comunes
+    await queryInterface.addIndex('propiedades', ['arrendador_uid']);
+    await queryInterface.addIndex('propiedades', ['estado']);
+    await queryInterface.addIndex('propiedades', ['precio']);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('propiedad');
+    await queryInterface.dropTable('propiedades');
   }
 };

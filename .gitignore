@@ -33,3 +33,6 @@ yarn.lock
 *.local
 config/*.json
 config/*.yaml
+
+
+serviceAccountKey.json

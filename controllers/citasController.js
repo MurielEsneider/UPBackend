@@ -1,7 +1,7 @@
 const { Cita } = require('../models');
 
 // Obtener todas las citas
-exports.getAllCitas = async (req, res) => {
+const getAllCitas = async (req, res) => {
   try {
     const citas = await Cita.findAll();
     res.json(citas);
@@ -11,7 +11,7 @@ exports.getAllCitas = async (req, res) => {
 };
 
 // Obtener una cita por ID
-exports.getCitaById = async (req, res) => {
+const getCitaById = async (req, res) => {
   try {
     const cita = await Cita.findByPk(req.params.id);
     if (!cita) return res.status(404).json({ error: 'Cita no encontrada' });
@@ -22,7 +22,7 @@ exports.getCitaById = async (req, res) => {
 };
 
 // Crear una nueva cita
-exports.createCita = async (req, res) => {
+const createCita = async (req, res) => {
   try {
     const cita = await Cita.create(req.body);
     res.status(201).json(cita);
@@ -32,7 +32,7 @@ exports.createCita = async (req, res) => {
 };
 
 // Actualizar una cita
-exports.updateCita = async (req, res) => {
+const updateCita = async (req, res) => {
   try {
     const cita = await Cita.findByPk(req.params.id);
     if (!cita) return res.status(404).json({ error: 'Cita no encontrada' });
@@ -45,7 +45,7 @@ exports.updateCita = async (req, res) => {
 };
 
 // Eliminar una cita
-exports.deleteCita = async (req, res) => {
+const deleteCita = async (req, res) => {
   try {
     const cita = await Cita.findByPk(req.params.id);
     if (!cita) return res.status(404).json({ error: 'Cita no encontrada' });
@@ -55,4 +55,12 @@ exports.deleteCita = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+module.exports = {
+  getAllCitas,
+  getCitaById,
+  createCita,
+  updateCita,
+  deleteCita
 };

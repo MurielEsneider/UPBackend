@@ -23,6 +23,28 @@ const obtenerPropiedades = async (req, res) => {
   }
 };
 
+// GET: Obtener propiedad por ID
+const obtenerPropiedadId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Buscamos en la base de datos la propiedad con el ID especificado
+    const propiedad = await Propiedad.findByPk(id);
+
+    // Si no se encuentra la propiedad, devolvemos un 404
+    if (!propiedad) {
+      return res.status(404).json({ error: 'Publicación no encontrada' });
+    }
+
+    // Retornamos la propiedad como JSON
+    return res.json(propiedad);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+
+
 // POST: Crear propiedad
 const crearPropiedad = (req, res) => {
   // Ejecutamos el middleware de Multer para procesar el archivo con la clave "imagen"
@@ -67,34 +89,34 @@ const crearPropiedad = (req, res) => {
 
 // PUT: Editar propiedad
 const editarPropiedad = (req, res) => {
-  // Usamos Multer para procesar el archivo (si se envía uno nuevo)
+  // Procesamos con Multer para manejar el archivo (campo "imagen")
   upload.single("imagen")(req, res, async (err) => {
     if (err) {
-      // Si ocurre un error en la subida del archivo, devolvemos el error
+      // Si ocurre un error en la subida del archivo, se devuelve un error
       return res.status(400).json({ error: err.message });
     }
     try {
-      const { id } = req.params; // ID de la propiedad a editar
-      // Extraemos los campos enviados en el cuerpo de la petición
-      const { titulo, descripcion, direccion, precio, propietario_id } = req.body;
-      
+      // Obtenemos el id de la propiedad a editar desde req.params
+      const { id } = req.params;
       // Buscamos la propiedad en la base de datos
       const propiedad = await Propiedad.findByPk(id);
       if (!propiedad) {
         return res.status(404).json({ error: 'Propiedad no encontrada' });
       }
       
-      // Si se envía un nuevo archivo, usamos su nombre; de lo contrario, conservamos la imagen actual
+      // Extraemos los campos enviados en el cuerpo de la petición
+      const { titulo, descripcion, direccion, precio, propietario_id } = req.body;
+      
+      // Si se envía un nuevo archivo, usamos su nombre; si no, conservamos la imagen actual
       const nuevaImagen = req.file ? req.file.filename : propiedad.imagen;
       
-      // Actualizamos la propiedad con los nuevos datos (o mantenemos los anteriores si no se proporcionan)
+      // Actualizamos la propiedad con los nuevos datos (o dejamos los anteriores si no se proporcionan)
       const propiedadActualizada = await propiedad.update({
         titulo: titulo || propiedad.titulo,
         descripcion: descripcion || propiedad.descripcion,
         direccion: direccion || propiedad.direccion,
         precio: precio || propiedad.precio,
         imagen: nuevaImagen,
-        // Si se envía un propietario_id, lo actualizamos; de lo contrario, se conserva el actual
         propietario_id: propietario_id || propiedad.propietario_id
       });
       
@@ -129,6 +151,8 @@ const eliminarPropiedad = async (req, res) => {
 
 module.exports = {
   crearPropiedad,
+  obtenerPropiedadId,
   obtenerPropiedades,
+  editarPropiedad,
   eliminarPropiedad
 };

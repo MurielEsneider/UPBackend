@@ -2,28 +2,28 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('caracteristicapropiedades', { // Nombre de tabla en minúsculas y snake_case
-      id: {
-        allowNull: false,
+    await queryInterface.createTable('caracteristicas_propiedades', {
+      caracteristica_id: {  // 👈 Nombre coherente
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        allowNull: false
       },
       propiedad_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'propiedades', // Nombre correcto de la tabla (en minúsculas)
-          key: 'propiedad_id'   // Clave correcta de referencia
+          model: 'propiedades', 
+          key: 'propiedad_id'  // 👈 Corregido (antes 'id')
         },
         onDelete: 'CASCADE'
       },
       tipo_caracteristica: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: false
       },
       valor: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false
       },
       createdAt: {
@@ -34,11 +34,16 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
       }
     });
+
+    // Índices para consultas comunes
+    await queryInterface.addIndex('caracteristicas_propiedades', ['propiedad_id']);
+    await queryInterface.addIndex('caracteristicas_propiedades', ['tipo_caracteristica']);
   },
+  
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('caracteristicapropiedades'); // Nombre consistente en minúsculas
+    await queryInterface.dropTable('caracteristicas_propiedades');
   }
 };

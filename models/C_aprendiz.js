@@ -12,10 +12,16 @@ module.exports = (sequelize) => {
   }
 
   Aprendiz.init({
+    aprendiz_id: {  // 👈 Nombre consistente para PK
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
     usuario_id: { 
       type: DataTypes.INTEGER, 
-      primaryKey: true, 
-      allowNull: false 
+      allowNull: false,
+      unique: true  // 👈 Para relación 1:1
     },
     programa_formacion: { 
       type: DataTypes.STRING, 
@@ -23,7 +29,10 @@ module.exports = (sequelize) => {
     },
     ficha: { 
       type: DataTypes.INTEGER, 
-      allowNull: false 
+      allowNull: false,
+      validate: {
+        isInt: true
+      }
     },
     identificacion_sena: { 
       type: DataTypes.STRING, 
@@ -32,8 +41,9 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    modelName: "Aprendiz",
-    timestamps: false, // Si no necesitas createdAt y updatedAt
+    modelName: "Aprendiz",  // 👈 En PascalCase y singular
+    tableName: 'aprendices',  // 👈 Nombre de tabla en plural
+    timestamps: true  // Coincide con la migración
   });
 
   return Aprendiz;
