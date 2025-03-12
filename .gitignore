@@ -29,10 +29,7 @@ yarn.lock
 *.sqlite-journal
 
 ### Archivos de configuración y credenciales ###
-.env*
-*.local
-config/*.json
-config/*.yaml
+
 
 
 serviceAccountKey.json
