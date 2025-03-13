@@ -14,7 +14,7 @@ app.use(express.json());
 
 // Configurar CORS
 const corsOptions = {
-  origin: ['http://localhost:3003', 'https://midominio.com'],
+  origin: ['http://localhost:3000', 'https://midominio.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

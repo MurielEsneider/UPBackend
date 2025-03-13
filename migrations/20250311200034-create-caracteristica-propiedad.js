@@ -13,9 +13,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'propiedades', 
-          key: 'propiedad_id'  // 👈 Corregido (antes 'id')
+          model: 'propiedades',
+          key: 'id'   // Referenciamos la columna "id" de la tabla "propiedades"
         },
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
       tipo_caracteristica: {

@@ -2,16 +2,15 @@
 const { Propiedad } = require('../models');
 const upload = require('../config/upload'); // Importamos la configuración de Multer
 
-
 // GET: Obtener propiedades
 const obtenerPropiedades = async (req, res) => {
   try {
-    // Extraemos y limpiamos el query parameter "propietario_id"
-    const propietario_id = req.query.propietario_id ? req.query.propietario_id.trim() : null;
+    // Extraemos y limpiamos el query parameter "arrendador_uid"
+    const arrendador_uid = req.body.arrendador_uid ? req.body.arrendador_uid.trim() : null;
     let propiedades;
-    if (propietario_id) {
-      // Si se proporciona, filtramos las propiedades que tengan ese propietario_id
-      propiedades = await Propiedad.findAll({ where: { propietario_id } });
+    if (arrendador_uid) {
+      // Si se proporciona, filtramos las propiedades que tengan ese arrendador_uid
+      propiedades = await Propiedad.findAll({ where: { arrendador_uid } });
     } else {
       // Si no se especifica, se devuelven todas las propiedades
       propiedades = await Propiedad.findAll();
@@ -43,8 +42,6 @@ const obtenerPropiedadId = async (req, res) => {
   }
 };
 
-
-
 // POST: Crear propiedad
 const crearPropiedad = (req, res) => {
   // Ejecutamos el middleware de Multer para procesar el archivo con la clave "imagen"
@@ -55,7 +52,13 @@ const crearPropiedad = (req, res) => {
     }
     try {
       // Extraemos los campos enviados en el cuerpo de la petición
-      const { titulo, descripcion, direccion, precio, propietario_id } = req.body;
+      // Soportamos ambos nombres de campo: arrendador_uid y propietario_uid
+      const { titulo, descripcion, direccion, precio, arrendador_uid, propietario_uid } = req.body;
+      const uid = arrendador_uid || propietario_uid;
+      
+      if (!uid) {
+        return res.status(400).json({ error: "Se requiere el UID del arrendador" });
+      }
       
       // Si no se ha subido un archivo, retornamos un error
       if (!req.file) {
@@ -69,7 +72,7 @@ const crearPropiedad = (req, res) => {
         direccion,
         precio,
         imagen: req.file.filename, // Se guarda el nombre del archivo generado por Multer
-        propietario_id  // Se asume que este valor es el UID del propietario (tipo STRING) o el id según tu configuración
+        arrendador_uid: uid // Asignamos el UID obtenido
       });
 
       // Retornamos respuesta exitosa con el id de la nueva propiedad
@@ -81,11 +84,8 @@ const crearPropiedad = (req, res) => {
       console.error("Error al crear la propiedad:", error);
       return res.status(500).json({ error: error.message || "Error al crear la propiedad" });
     }
-    
   });
 };
-
-
 
 // PUT: Editar propiedad
 const editarPropiedad = (req, res) => {
@@ -105,7 +105,9 @@ const editarPropiedad = (req, res) => {
       }
       
       // Extraemos los campos enviados en el cuerpo de la petición
-      const { titulo, descripcion, direccion, precio, propietario_id } = req.body;
+      // Soportamos ambos nombres de campo para el UID
+      const { titulo, descripcion, direccion, precio, arrendador_uid, propietario_uid } = req.body;
+      const uid = arrendador_uid || propietario_uid || propiedad.arrendador_uid;
       
       // Si se envía un nuevo archivo, usamos su nombre; si no, conservamos la imagen actual
       const nuevaImagen = req.file ? req.file.filename : propiedad.imagen;
@@ -117,7 +119,7 @@ const editarPropiedad = (req, res) => {
         direccion: direccion || propiedad.direccion,
         precio: precio || propiedad.precio,
         imagen: nuevaImagen,
-        propietario_id: propietario_id || propiedad.propietario_id
+        arrendador_uid: uid
       });
       
       return res.status(200).json({

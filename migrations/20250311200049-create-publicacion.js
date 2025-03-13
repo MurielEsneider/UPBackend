@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: 'propiedades',
-          key: 'propiedad_id'
+          key: 'id'
         },
         onDelete: 'CASCADE'
       },

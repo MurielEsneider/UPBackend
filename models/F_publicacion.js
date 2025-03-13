@@ -31,7 +31,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       references: {
         model: 'propiedades',  // 👈 Tabla corregida
-        key: 'propiedad_id'
+        key: 'id'
       },
       onDelete: 'CASCADE'
     },

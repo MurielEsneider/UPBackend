@@ -37,43 +37,40 @@ module.exports = (sequelize) => {
   }
 
   Propiedad.init({
-    propiedad_id: {
+    id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
       primaryKey: true,
+      autoIncrement: true
+    },
+    titulo: {
+      type: DataTypes.STRING,
       allowNull: false
     },
-    arrendador_uid: { 
-      type: DataTypes.STRING(28), // 👈 Debe coincidir con Arrendador.uid
-      allowNull: false,
-      references: {
-        model: 'arrendadores',
-        key: 'uid'
-      },
-      onDelete: 'CASCADE'
-    },
+    descripcion: DataTypes.TEXT,
     direccion: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      validate: {
-        notEmpty: true
-      }
-    },
-    descripcion: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.STRING,
+      allowNull: false
     },
     precio: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-      validate: {
-        min: 0  // Precio no puede ser negativo
-      }
+      type: DataTypes.DECIMAL,
+      allowNull: false
     },
-    estado: {
-      type: DataTypes.ENUM('disponible', 'ocupada', 'mantenimiento'),
+    imagen: DataTypes.STRING,
+    publicado: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 'disponible'
+      defaultValue: false
+    },
+    // Cambiamos el tipo a STRING para almacenar el UID de Firebase del propietario
+    arrendador_uid: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: 'arrendadores', // Nombre de la tabla en la base de datos
+        key: 'uid'            // Columna a la que se hace referencia (UID de Firebase)
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     }
   }, {
     sequelize,

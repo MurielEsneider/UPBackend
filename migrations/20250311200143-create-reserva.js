@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
         references: {  // 👈 Referencia añadida
           model: 'propiedades',
-          key: 'propiedad_id'
+          key: 'id'
         },
         onDelete: 'CASCADE'
       },

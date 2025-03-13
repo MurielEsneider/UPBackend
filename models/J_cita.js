@@ -36,7 +36,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       references: {  // 👈 Referencia añadida
         model: 'propiedades',
-        key: 'propiedad_id'
+        key: 'id'
       }
     },
     fecha: {
