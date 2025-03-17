@@ -8,6 +8,9 @@ const path = require('path'); // Asegúrate de importar path
 
 const publicacionesRoutes = require('./routes/publicacionesArrendatarioRoute');
 const arrendadorRoutes = require('./routes/arrendadorRoutes');
+const citasRoutes = require('./routes/citasRoutes');
+const reservasRoutes = require('./routes/reservasRoutes');
+const notificacionesRoutes = require('./routes/notificacionesRoutes');
 
 const app = express();
 app.use(express.json());
@@ -56,6 +59,10 @@ app.get('/', (req, res) => {
 // Rutas de publicaciones y propietarios
 app.use('/api', publicacionesRoutes);
 app.use('/api', arrendadorRoutes);
+app.use('/api', citasRoutes);
+app.use('/api', reservasRoutes);
+app.use('/api', notificacionesRoutes);
+
 
 // Iniciar servidor
 const PORT = process.env.PORT || 4000;

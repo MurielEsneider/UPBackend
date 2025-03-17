@@ -5,18 +5,18 @@ module.exports = (sequelize) => {
   class Arrendador extends Model {
     static associate(models) {
       // Relación con Propiedades (1:N)
-      Arrendador.hasMany(models.Propiedad, { 
+      Arrendador.hasMany(models.Propiedad, {
         foreignKey: 'arrendador_uid',  // 👈 Nombre consistente con PK
         as: 'propiedades',
         onDelete: 'CASCADE'
       });
 
       // Relación con Notificaciones (1:N)
-      /* Arrendador.hasMany(models.Notificacion, {
+      Arrendador.hasMany(models.Notificacion, {
         foreignKey: 'arrendador_uid',  // 👈 Mismo formato
         as: 'notificaciones',
         onDelete: 'CASCADE'
-      }); */
+      });
     }
   }
 

@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const citaController = require('../controllers/citasController');
 
-router.get('/', citaController.getAllCitas);
-router.get('/:id', citaController.getCitaById);
-router.post('/', citaController.createCita);
-router.put('/:id', citaController.updateCita);
-router.delete('/:id', citaController.deleteCita);
+router.get('/citas', citaController.getAllCitas);
+router.get('/citas/:id', citaController.getCitaById);
+router.post('/citas', citaController.createCita);
+router.put('/citas/:id', citaController.updateCita);
+router.delete('/citas/:id', citaController.deleteCita);
 
 module.exports = router;
