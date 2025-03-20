@@ -33,6 +33,12 @@ module.exports = (sequelize) => {
         as: 'citas',
         onDelete: 'CASCADE'
       });
+      
+      Propiedad.hasMany(models.PropiedadImagen, {
+        foreignKey: 'propiedad_id',
+        as: 'imagenes',
+        onDelete: 'CASCADE'
+      });
     }
   }
 
@@ -54,12 +60,6 @@ module.exports = (sequelize) => {
     precio: {
       type: DataTypes.DECIMAL,
       allowNull: false
-    },
-    imagen: DataTypes.STRING,
-    publicado: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
     },
     // Cambiamos el tipo a STRING para almacenar el UID de Firebase del propietario
     arrendador_uid: {

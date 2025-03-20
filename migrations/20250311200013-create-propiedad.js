@@ -24,9 +24,6 @@ module.exports = {
         type: Sequelize.DECIMAL,
         allowNull: false
       },
-      imagen: {
-        type: Sequelize.STRING
-      },
       publicado: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

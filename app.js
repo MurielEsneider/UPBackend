@@ -3,14 +3,14 @@ const express = require('express');
 const mysql = require('mysql2');
 const chalk = require('chalk');
 const cors = require('cors');
-const sharp = require('sharp');
-const path = require('path'); // Asegúrate de importar path
+const path = require('path'); 
 
 const publicacionesRoutes = require('./routes/publicacionesArrendatarioRoute');
 const arrendadorRoutes = require('./routes/arrendadorRoutes');
 const citasRoutes = require('./routes/citasRoutes');
 const reservasRoutes = require('./routes/reservasRoutes');
 const notificacionesRoutes = require('./routes/notificacionesRoutes');
+const caracteristicasRoutes = require('./routes/característicasController');
 
 const app = express();
 app.use(express.json());
@@ -41,15 +41,6 @@ db.connect(err => {
   }
 });
 
-// Helper para optimizar imágenes (opcional)
-const helperImg = (filePath, fileName, size = 300) => {
-  return sharp(filePath)
-    .resize(size)
-    .toFile(`optimize/t${fileName}.png`);
-};
-
-// **Agregar esta línea para servir archivos estáticos desde la carpeta "uploads"**
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ruta de prueba
 app.get('/', (req, res) => {
@@ -62,7 +53,7 @@ app.use('/api', arrendadorRoutes);
 app.use('/api', citasRoutes);
 app.use('/api', reservasRoutes);
 app.use('/api', notificacionesRoutes);
-
+app.use('/api', caracteristicasRoutes);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 4000;
