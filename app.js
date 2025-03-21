@@ -5,13 +5,14 @@ const chalk = require('chalk');
 const cors = require('cors');
 const path = require('path'); 
 
-const publicacionesRoutes = require('./routes/publicacionesArrendatarioRoute');
 const arrendadorRoutes = require('./routes/arrendadorRoutes');
 const citasRoutes = require('./routes/citasRoutes');
 const reservasRoutes = require('./routes/reservasRoutes');
 const notificacionesRoutes = require('./routes/notificacionesRoutes');
 const caracteristicasRoutes = require('./routes/característicasController');
 const propiedadRoute = require('./routes/propiedadRoute');
+const imagenesRoutes = require('./routes/imagesRouter');
+
 
 
 const app = express();
@@ -50,13 +51,14 @@ app.get('/', (req, res) => {
 });
 
 // Rutas de publicaciones y propietarios
-app.use('/api', publicacionesRoutes);
 app.use('/api', arrendadorRoutes);
 app.use('/api', citasRoutes);
 app.use('/api', reservasRoutes);
 app.use('/api', notificacionesRoutes);
 app.use('/api', caracteristicasRoutes);
 app.use('/api', propiedadRoute);
+app.use('/api', imagenesRoutes);
+
 
 
 // Iniciar servidor

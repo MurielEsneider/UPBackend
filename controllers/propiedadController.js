@@ -88,29 +88,61 @@ const getPropiedadesByArrendador = async (req, res) => {
 
 const getPublicacion = async (req, res) => {
   try {
-    const { id } = req.params; // ID de la propiedad a mostrar
+    const { id } = req.params;
+
+    // Validación mejorada del ID
+    if (!id || isNaN(id)) {
+      return res.status(400).json({
+        error: "ID inválido",
+        message: "El ID debe ser un número válido"
+      });
+    }
 
     const propiedad = await Propiedad.findByPk(id, {
       include: [
         {
           model: PropiedadImagen,
-          as: 'imagenes'  // Debe coincidir con el alias definido en la asociación
+          as: 'imagenes',
+          attributes: ['id', 'url', 'orden'],
+          order: [['orden', 'ASC']]
         },
         {
           model: CaracteristicaPropiedad,
-          as: 'caracteristicas' // Asegúrate de que este alias coincide con tu modelo de características
+          as: 'caracteristicas',
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'propiedad_id']
+          }
         }
-      ]
+      ],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'usuario_id']
+      }
     });
 
     if (!propiedad) {
-      return res.status(404).json({ error: "Propiedad no encontrada" });
+      return res.status(404).json({
+        error: "Propiedad no encontrada",
+        details: `No existe una propiedad con el ID: ${id}`
+      });
     }
 
-    return res.status(200).json(propiedad);
+    // Transformación de datos
+    const response = {
+      ...propiedad.toJSON(),
+      precio: Number(propiedad.precio)
+    };
+
+    return res.status(200).json(response);
+
   } catch (error) {
     console.error("Error al obtener la publicación:", error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    
+    const errorResponse = {
+      error: "Error interno del servidor",
+      details: process.env.NODE_ENV === 'development' ? error.message : null
+    };
+
+    return res.status(500).json(errorResponse);
   }
 };
 

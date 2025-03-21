@@ -1,26 +1,32 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     await queryInterface.createTable('caracteristicas_propiedades', {
-      caracteristica_id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
+      id: {
+        allowNull: false,
         autoIncrement: true,
-        allowNull: false
+        primaryKey: true,
+        type: Sequelize.INTEGER
       },
       propiedad_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'propiedades', // Nombre de la tabla referenciada
-          key: 'id'             // Columna de la tabla referenciada
+          model: 'propiedades',
+          key: 'id'
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       tipo_vivienda: {
-        type: Sequelize.ENUM('Apartamento', 'Casa', 'Casa de Familia', 'Estudio', 'Habitación'),
+        type: Sequelize.ENUM(
+          'Apartamento', 
+          'Casa', 
+          'Casa de Familia', 
+          'Estudio', 
+          'Habitación'
+        ),
         allowNull: true
       },
       wifi: {
@@ -107,14 +113,31 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
       }
+    });
+
+    // Índices optimizados
+    await queryInterface.addIndex('caracteristicas_propiedades', ['propiedad_id'], {
+      name: 'idx_caract_propiedad_id'
+    });
+    
+    await queryInterface.addIndex('caracteristicas_propiedades', ['tipo_vivienda'], {
+      name: 'idx_caract_tipo_vivienda'
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  async down(queryInterface, Sequelize) {
+    // Eliminar índices primero
+    await queryInterface.removeIndex('caracteristicas_propiedades', 'idx_caract_propiedad_id');
+    await queryInterface.removeIndex('caracteristicas_propiedades', 'idx_caract_tipo_vivienda');
+    
+    // Eliminar tabla
     await queryInterface.dropTable('caracteristicas_propiedades');
-    // Eliminar el tipo ENUM si existe para evitar conflictos en futuras migraciones
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_caracteristicas_propiedades_tipo_vivienda";');
+    
+    // Eliminar tipo ENUM
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_caracteristicas_propiedades_tipo_vivienda";'
+    );
   }
 };
