@@ -11,6 +11,8 @@ const citasRoutes = require('./routes/citasRoutes');
 const reservasRoutes = require('./routes/reservasRoutes');
 const notificacionesRoutes = require('./routes/notificacionesRoutes');
 const caracteristicasRoutes = require('./routes/característicasController');
+const propiedadRoute = require('./routes/propiedadRoute');
+
 
 const app = express();
 app.use(express.json());
@@ -54,6 +56,8 @@ app.use('/api', citasRoutes);
 app.use('/api', reservasRoutes);
 app.use('/api', notificacionesRoutes);
 app.use('/api', caracteristicasRoutes);
+app.use('/api', propiedadRoute);
+
 
 // Iniciar servidor
 const PORT = process.env.PORT || 4000;
