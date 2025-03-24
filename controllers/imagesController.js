@@ -1,5 +1,4 @@
 const { PropiedadImagen } = require('../models');
-const { Sequelize } = require('sequelize'); // Importa Sequelize if needed
 
 const saveUrlImages = async (req, res) => {
   // Si estás usando Sequelize y tu instancia de Sequelize está accesible

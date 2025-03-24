@@ -69,7 +69,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 1
       },
-      baños: {
+      banos: {
         type: Sequelize.INTEGER,
         defaultValue: 1
       },
@@ -114,7 +114,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
-      }
+      },
     });
 
     // Índices optimizados

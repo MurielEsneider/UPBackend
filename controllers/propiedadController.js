@@ -1,4 +1,5 @@
 const { Propiedad, PropiedadImagen, CaracteristicaPropiedad } = require('../models');
+const { sequelize } = require('../models');
 
 const crearPropiedad = async (req, res) => {
   console.log("Iniciando creación de propiedad...");
@@ -7,7 +8,7 @@ const crearPropiedad = async (req, res) => {
     const { titulo, descripcion, direccion, precio, arrendador_uid, imagenes } = req.body;
 
     console.log("Datos recibidos en la solicitud:", {
-      titulo,
+      titulo, 
       descripcion,
       direccion,
       precio,
@@ -103,21 +104,18 @@ const getPublicacion = async (req, res) => {
         {
           model: PropiedadImagen,
           as: 'imagenes',
-          attributes: ['id', 'url', 'orden'],
-          order: [['orden', 'ASC']]
+          attributes: ['id', 'url', 'orden']
         },
         {
           model: CaracteristicaPropiedad,
           as: 'caracteristicas',
-          attributes: {
-            exclude: ['createdAt', 'updatedAt', 'propiedad_id']
-          }
+          attributes: { exclude: ['createdAt', 'updatedAt', 'propiedad_id'] }
         }
       ],
-      attributes: {
-        exclude: ['createdAt', 'updatedAt', 'usuario_id']
-      }
+      order: [[{ model: PropiedadImagen, as: 'imagenes' }, 'orden', 'ASC']],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'usuario_id'] }
     });
+    
 
     if (!propiedad) {
       return res.status(404).json({
@@ -146,8 +144,162 @@ const getPublicacion = async (req, res) => {
   }
 };
 
+
+
+const eliminarPropiedad = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { id } = req.params;
+    const { arrendador_uid } = req.body;
+
+    // Validar ID
+    if (!id || isNaN(id)) {
+      await transaction.rollback();
+      return res.status(400).json({ error: "ID de propiedad inválido" });
+    }
+
+    // Buscar propiedad
+    const propiedad = await Propiedad.findByPk(id, { transaction });
+
+    if (!propiedad) {
+      await transaction.rollback();
+      return res.status(404).json({ error: "Propiedad no encontrada" });
+    }
+
+    // Verificar que el arrendador es el dueño
+    if (propiedad.arrendador_uid !== arrendador_uid) {
+      await transaction.rollback();
+      return res.status(403).json({ 
+        error: "No autorizado para esta acción",
+        details: `El arrendador_uid proporcionado (${arrendador_uid}) no coincide con el dueño de la propiedad (${propiedad.arrendador_uid})`
+      });
+    }
+
+    // Eliminar propiedad
+    await propiedad.destroy({ transaction });
+    await transaction.commit();
+
+    return res.status(200).json({ message: "Propiedad eliminada correctamente" });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error al eliminar propiedad:", error);
+    return res.status(500).json({ 
+      error: "Error al eliminar propiedad",
+      details: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+
+const editarPropiedad = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { id } = req.params;
+    const { 
+      titulo, 
+      descripcion, 
+      direccion, 
+      precio, 
+      arrendador_uid,
+      imagenes,
+      caracteristicas
+    } = req.body;
+
+    // Validaciones básicas
+    if (!id || isNaN(id)) {
+      await transaction.rollback();
+      return res.status(400).json({ error: "ID de propiedad inválido" });
+    }
+
+    if (!arrendador_uid) {
+      await transaction.rollback();
+      return res.status(400).json({ error: "Se requiere UID de arrendador" });
+    }
+
+    // Buscar y verificar propiedad
+    const propiedad = await Propiedad.findByPk(id, { transaction });
+
+    if (!propiedad) {
+      await transaction.rollback();
+      return res.status(404).json({ error: "Propiedad no encontrada" });
+    }
+
+    if (propiedad.arrendador_uid !== arrendador_uid) {
+      await transaction.rollback();
+      return res.status(403).json({ error: "No autorizado para esta acción" });
+    }
+
+    // Actualizar campos básicos
+    const updates = {};
+    if (titulo) updates.titulo = titulo;
+    if (descripcion) updates.descripcion = descripcion;
+    if (direccion) updates.direccion = direccion;
+    if (precio) updates.precio = precio;
+
+    await propiedad.update(updates, { transaction });
+
+    // Manejo de imágenes (reemplazo completo)
+    if (imagenes && Array.isArray(imagenes)) {
+      // Eliminar imágenes existentes
+      await PropiedadImagen.destroy({
+        where: { propiedad_id: id },
+        transaction
+      });
+
+      // Crear nuevas imágenes
+      await PropiedadImagen.bulkCreate(
+        imagenes.map((url, index) => ({
+          url,
+          orden: index,
+          propiedad_id: id
+        })),
+        { transaction }
+      );
+    }
+
+    // Manejo de características (actualización)
+    if (caracteristicas) {
+      await CaracteristicaPropiedad.update(caracteristicas, {
+        where: { propiedad_id: id },
+        transaction
+      });
+    }
+
+    await transaction.commit();
+    
+    // Obtener propiedad actualizada
+    const propiedadActualizada = await Propiedad.findByPk(id, {
+      include: [
+        { model: PropiedadImagen, as: 'imagenes' },
+        { model: CaracteristicaPropiedad, as: 'caracteristicas' }
+      ]
+    });
+
+    return res.status(200).json(propiedadActualizada);
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error al editar propiedad:", error);
+    
+    // Manejar errores de validación de Sequelize
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: "Error de validación",
+        details: error.errors.map(e => e.message)
+      });
+    }
+
+    return res.status(500).json({
+      error: "Error al editar propiedad",
+      details: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
 module.exports = {
   crearPropiedad,
   getPropiedadesByArrendador,
-  getPublicacion
+  getPublicacion,
+  eliminarPropiedad,
+  editarPropiedad
 };

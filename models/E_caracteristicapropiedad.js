@@ -17,7 +17,7 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      field: 'caracteristica_id'  // Mapeo a columna existente
+      field: 'id'  // Mapeo a columna existente
     },
     propiedad_id: {
       type: DataTypes.INTEGER,
@@ -48,7 +48,7 @@ module.exports = (sequelize) => {
         }
       }
     },
-    baños: {
+    banos: {
       type: DataTypes.INTEGER,
       defaultValue: 1,
       validate: {
