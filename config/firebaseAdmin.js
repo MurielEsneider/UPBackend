@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./arrendamientos-80c2a-firebase-adminsdk-fbsvc-1a301682ff.json'); // Asegúrate de que la ruta es correcta
+const serviceAccount = require('./serviceAccountKey.json'); // Asegúrate de que la ruta es correcta
 
 serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 
