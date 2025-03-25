@@ -33,11 +33,13 @@ const crearPropiedad = async (req, res) => {
     });
 
     // Si se envía un array de imágenes, creamos los registros asociados
+    // Dentro de crearPropiedad, al crear PropiedadImagen:
     if (imagenes && Array.isArray(imagenes) && imagenes.length > 0) {
       for (let i = 0; i < imagenes.length; i++) {
         await PropiedadImagen.create({
-          url: imagenes[i], // Se espera que 'imagenes[i]' sea el path original, ej.: "photos/1645734567890-image.jpg"
-          orden: i, // El orden puede ser útil para definir cuál es la imagen principal o el orden de despliegue
+          url: imagenes[i].url,      // URL pública (opcional)
+          path: imagenes[i].path,    // Path en Firebase Storage (ej: "photos/...")
+          orden: i,
           propiedad_id: nuevaPropiedad.id
         });
       }
@@ -181,21 +183,30 @@ const eliminarPropiedad = async (req, res) => {
       transaction
     });
 
+
     for (const img of imagenes) {
-      if (img.path) {
-        console.log("Intentando eliminar imagen con path:", img.path);
-        try {
-          await bucket.file(img.path).delete();
-          console.log(`Imagen eliminada: ${img.path}`);
-        } catch (error) {
-          console.error("Error al eliminar imagen en Firebase Storage:", img.path, error);
-          // Aquí podrías retornar el error o continuar
+      try {
+        if (!img.path) {
+          console.error("Imagen sin path:", img.id);
+          continue;
         }
-      } else {
-        console.log("No se encontró el campo 'path' para esta imagen, id:", img.id);
+
+        const file = bucket.file(img.path);
+        const [exists] = await file.exists(); // Verifica existencia
+
+        if (exists) {
+          await file.delete();
+          console.log("Imagen eliminada:", img.path);
+        } else {
+          console.log("Imagen no existe en Storage:", img.path);
+          // Opcional: Eliminar registro de la base de datos
+          await PropiedadImagen.destroy({ where: { id: img.id } });
+        }
+      } catch (error) {
+        console.error("Error eliminando imagen:", error.message);
       }
     }
-    
+
 
 
     // Eliminar propiedad
