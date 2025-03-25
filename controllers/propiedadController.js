@@ -1,5 +1,6 @@
 const { Propiedad, PropiedadImagen, CaracteristicaPropiedad } = require('../models');
 const { sequelize } = require('../models');
+const { bucket } = require('../config/firebaseAdmin'); // Importa el bucket para Firebase Storage
 
 const crearPropiedad = async (req, res) => {
   console.log("Iniciando creación de propiedad...");
@@ -8,7 +9,7 @@ const crearPropiedad = async (req, res) => {
     const { titulo, descripcion, direccion, precio, arrendador_uid, imagenes } = req.body;
 
     console.log("Datos recibidos en la solicitud:", {
-      titulo, 
+      titulo,
       descripcion,
       direccion,
       precio,
@@ -35,7 +36,7 @@ const crearPropiedad = async (req, res) => {
     if (imagenes && Array.isArray(imagenes) && imagenes.length > 0) {
       for (let i = 0; i < imagenes.length; i++) {
         await PropiedadImagen.create({
-          url: imagenes[i],
+          url: imagenes[i], // Se espera que 'imagenes[i]' sea el path original, ej.: "photos/1645734567890-image.jpg"
           orden: i, // El orden puede ser útil para definir cuál es la imagen principal o el orden de despliegue
           propiedad_id: nuevaPropiedad.id
         });
@@ -74,8 +75,8 @@ const getPropiedadesByArrendador = async (req, res) => {
     });
 
     if (propiedades.length === 0) {
-      console.log("No se encontraron propiedades para este arrendador.");
-      return res.status(404).json({ error: "No hay propiedades registradas" });
+      // Simplemente retorna un arreglo vacío con status 200
+      return res.status(200).json([]);
     }
 
     console.log("Propiedades encontradas:", propiedades);
@@ -104,7 +105,7 @@ const getPublicacion = async (req, res) => {
         {
           model: PropiedadImagen,
           as: 'imagenes',
-          attributes: ['id', 'url', 'orden']
+          attributes: ['id', 'url', 'path', 'orden']
         },
         {
           model: CaracteristicaPropiedad,
@@ -115,7 +116,6 @@ const getPublicacion = async (req, res) => {
       order: [[{ model: PropiedadImagen, as: 'imagenes' }, 'orden', 'ASC']],
       attributes: { exclude: ['createdAt', 'updatedAt', 'usuario_id'] }
     });
-    
 
     if (!propiedad) {
       return res.status(404).json({
@@ -134,7 +134,7 @@ const getPublicacion = async (req, res) => {
 
   } catch (error) {
     console.error("Error al obtener la publicación:", error);
-    
+
     const errorResponse = {
       error: "Error interno del servidor",
       details: process.env.NODE_ENV === 'development' ? error.message : null
@@ -143,8 +143,6 @@ const getPublicacion = async (req, res) => {
     return res.status(500).json(errorResponse);
   }
 };
-
-
 
 const eliminarPropiedad = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -169,11 +167,36 @@ const eliminarPropiedad = async (req, res) => {
     // Verificar que el arrendador es el dueño
     if (propiedad.arrendador_uid !== arrendador_uid) {
       await transaction.rollback();
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: "No autorizado para esta acción",
         details: `El arrendador_uid proporcionado (${arrendador_uid}) no coincide con el dueño de la propiedad (${propiedad.arrendador_uid})`
       });
     }
+
+    // Eliminar imágenes asociadas en Firebase Storage
+    // Primero, obtenemos todas las imágenes asociadas a la propiedad
+    // Eliminar imágenes asociadas en Firebase Storage
+    const imagenes = await PropiedadImagen.findAll({
+      where: { propiedad_id: id },
+      transaction
+    });
+
+    for (const img of imagenes) {
+      if (img.path) {
+        console.log("Intentando eliminar imagen con path:", img.path);
+        try {
+          await bucket.file(img.path).delete();
+          console.log(`Imagen eliminada: ${img.path}`);
+        } catch (error) {
+          console.error("Error al eliminar imagen en Firebase Storage:", img.path, error);
+          // Aquí podrías retornar el error o continuar
+        }
+      } else {
+        console.log("No se encontró el campo 'path' para esta imagen, id:", img.id);
+      }
+    }
+    
+
 
     // Eliminar propiedad
     await propiedad.destroy({ transaction });
@@ -184,23 +207,22 @@ const eliminarPropiedad = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.error("Error al eliminar propiedad:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: "Error al eliminar propiedad",
       details: process.env.NODE_ENV === 'development' ? error.message : null
     });
   }
 };
 
-
 const editarPropiedad = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { id } = req.params;
-    const { 
-      titulo, 
-      descripcion, 
-      direccion, 
-      precio, 
+    const {
+      titulo,
+      descripcion,
+      direccion,
+      precio,
       arrendador_uid,
       imagenes,
       caracteristicas
@@ -267,7 +289,7 @@ const editarPropiedad = async (req, res) => {
     }
 
     await transaction.commit();
-    
+
     // Obtener propiedad actualizada
     const propiedadActualizada = await Propiedad.findByPk(id, {
       include: [
@@ -281,7 +303,7 @@ const editarPropiedad = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.error("Error al editar propiedad:", error);
-    
+
     // Manejar errores de validación de Sequelize
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
@@ -296,6 +318,7 @@ const editarPropiedad = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   crearPropiedad,
   getPropiedadesByArrendador,
@@ -303,3 +326,5 @@ module.exports = {
   eliminarPropiedad,
   editarPropiedad
 };
+
+

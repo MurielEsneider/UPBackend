@@ -1,7 +1,7 @@
 'use strict';
-
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     await queryInterface.createTable('propiedad_imagenes', {
       id: {
         allowNull: false,
@@ -13,36 +13,28 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      path: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       orden: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         defaultValue: 0
       },
       propiedad_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'propiedades', // Nombre de la tabla de propiedades
-          key: 'id'
+          model: 'propiedades',  // Nombre de la tabla relacionada
+          key: 'id'             // Clave primaria de la tabla relacionada
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       }
-      // Si en tu modelo no usas timestamps, puedes omitir estos campos
-      // createdAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE,
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-      // },
-      // updatedAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE,
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-      // }
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('propiedad_imagenes');
   }
 };

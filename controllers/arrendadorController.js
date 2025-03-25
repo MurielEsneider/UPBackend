@@ -1,5 +1,5 @@
 const { Arrendador } = require('../models');
-const admin = require('../config/firebaseAdmin');
+const { admin } = require('../config/firebaseAdmin');
 
 // GET: Obtener todos los arrendadores
 const getArrendadores = async (req, res) => {
