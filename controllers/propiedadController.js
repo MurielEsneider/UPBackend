@@ -33,13 +33,18 @@ const crearPropiedad = async (req, res) => {
     });
 
     // Si se envía un array de imágenes, creamos los registros asociados
-    // Dentro de crearPropiedad, al crear PropiedadImagen:
-    if (imagenes && Array.isArray(imagenes) && imagenes.length > 0) {
-      for (let i = 0; i < imagenes.length; i++) {
+    if (imagenes && Array.isArray(imagenes)) {
+      for (const img of imagenes) {
+        // Extraer path desde la URL automáticamente
+        const urlObj = new URL(img.url);
+        let path = decodeURIComponent(urlObj.pathname)
+                    .replace(/^\//, '') // Quitar slash inicial
+                    .replace(/%20/g, ' '); // Decodificar espacios
+    
         await PropiedadImagen.create({
-          url: imagenes[i].url,      // URL pública (opcional)
-          path: imagenes[i].path,    // Path en Firebase Storage (ej: "photos/...")
-          orden: i,
+          url: img.url,
+          path: path, // Guardar path exacto
+          orden: img.orden,
           propiedad_id: nuevaPropiedad.id
         });
       }
@@ -152,75 +157,121 @@ const eliminarPropiedad = async (req, res) => {
     const { id } = req.params;
     const { arrendador_uid } = req.body;
 
-    // Validar ID
+    // 1. Validación robusta del ID
     if (!id || isNaN(id)) {
       await transaction.rollback();
-      return res.status(400).json({ error: "ID de propiedad inválido" });
-    }
-
-    // Buscar propiedad
-    const propiedad = await Propiedad.findByPk(id, { transaction });
-
-    if (!propiedad) {
-      await transaction.rollback();
-      return res.status(404).json({ error: "Propiedad no encontrada" });
-    }
-
-    // Verificar que el arrendador es el dueño
-    if (propiedad.arrendador_uid !== arrendador_uid) {
-      await transaction.rollback();
-      return res.status(403).json({
-        error: "No autorizado para esta acción",
-        details: `El arrendador_uid proporcionado (${arrendador_uid}) no coincide con el dueño de la propiedad (${propiedad.arrendador_uid})`
+      return res.status(400).json({ 
+        error: "ID inválido",
+        details: "El ID de propiedad debe ser un número válido" 
       });
     }
 
-    // Eliminar imágenes asociadas en Firebase Storage
-    // Primero, obtenemos todas las imágenes asociadas a la propiedad
-    // Eliminar imágenes asociadas en Firebase Storage
-    const imagenes = await PropiedadImagen.findAll({
-      where: { propiedad_id: id },
+    // 2. Buscar propiedad con sus imágenes
+    const propiedad = await Propiedad.findByPk(id, {
+      include: [{
+        model: PropiedadImagen,
+        as: 'imagenes',
+        attributes: ['id', 'path']
+      }],
       transaction
     });
 
+    if (!propiedad) {
+      await transaction.rollback();
+      return res.status(404).json({ 
+        error: "Propiedad no encontrada",
+        details: `No existe una propiedad con ID: ${id}`
+      });
+    }
 
-    for (const img of imagenes) {
+    // 3. Verificación de permisos
+    if (propiedad.arrendador_uid !== arrendador_uid) {
+      await transaction.rollback();
+      return res.status(403).json({
+        error: "No autorizado",
+        details: "Solo el propietario puede eliminar la propiedad"
+      });
+    }
+
+    // 4. Configuración de Firebase
+    const bucket = admin.storage().bucket("arrendamientos-80c2a.appspot.com");
+
+    // 5. Eliminación de imágenes con manejo avanzado
+    let deletedImages = 0;
+    const deleteOperations = propiedad.imagenes.map(async (img) => {
+      if (!img.path) {
+        console.warn(`⚠️ Imagen ID ${img.id} sin path definido`);
+        return;
+      }
+
       try {
-        if (!img.path) {
-          console.error("Imagen sin path:", img.id);
-          continue;
-        }
+        // Normalización del path
+        const normalizedPath = img.path
+          .trim()
+          .replace(/^\//, '') // Eliminar slash inicial
+          .replace(/%20/g, ' ') // Decodificar espacios
+          .replace(/\/+/g, '/'); // Normalizar múltiples slashes
 
-        const file = bucket.file(img.path);
-        const [exists] = await file.exists(); // Verifica existencia
+        const file = bucket.file(normalizedPath);
+        const [exists] = await file.exists();
 
         if (exists) {
           await file.delete();
-          console.log("Imagen eliminada:", img.path);
+          console.log(`✅ Imagen eliminada: ${normalizedPath}`);
+          deletedImages++;
         } else {
-          console.log("Imagen no existe en Storage:", img.path);
-          // Opcional: Eliminar registro de la base de datos
-          await PropiedadImagen.destroy({ where: { id: img.id } });
+          // Búsqueda insensible a mayúsculas/minúsculas
+          const fileName = normalizedPath.split('/').pop();
+          const [files] = await bucket.getFiles({
+            prefix: 'photos/'
+          });
+          
+          const matchingFile = files.find(f => 
+            f.name.toLowerCase().endsWith(fileName.toLowerCase())
+          );
+
+          if (matchingFile) {
+            await matchingFile.delete();
+            console.log(`✅ Imagen encontrada por coincidencia: ${matchingFile.name}`);
+            deletedImages++;
+          } else {
+            console.warn(`⚠️ Imagen no encontrada en Storage: ${normalizedPath}`);
+          }
         }
       } catch (error) {
-        console.error("Error eliminando imagen:", error.message);
+        console.error(`❌ Error al eliminar imagen: ${img.path}`, error.message);
       }
-    }
+    });
 
+    await Promise.all(deleteOperations);
 
-
-    // Eliminar propiedad
+    // 6. Eliminación en base de datos
+    await PropiedadImagen.destroy({ 
+      where: { propiedad_id: id }, 
+      transaction 
+    });
+    
     await propiedad.destroy({ transaction });
     await transaction.commit();
 
-    return res.status(200).json({ message: "Propiedad eliminada correctamente" });
+    return res.status(200).json({
+      success: true,
+      message: "Propiedad eliminada completamente",
+      deletedPropertyId: Number(id),
+      deletedImages,
+      remainingImages: propiedad.imagenes.length - deletedImages
+    });
 
   } catch (error) {
     await transaction.rollback();
-    console.error("Error al eliminar propiedad:", error);
+    console.error("❌ Error crítico:", error);
+    
     return res.status(500).json({
-      error: "Error al eliminar propiedad",
-      details: process.env.NODE_ENV === 'development' ? error.message : null
+      error: "Error interno del servidor",
+      details: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : null
     });
   }
 };
