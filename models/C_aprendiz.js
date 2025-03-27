@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
   class Aprendiz extends Model {
     static associate(models) {
       Aprendiz.belongsTo(models.Usuario, { 
-        foreignKey: "usuario_id", 
+        foreignKey: "usuario_uid", 
         onDelete: "CASCADE"
       });
     }
@@ -18,10 +18,13 @@ module.exports = (sequelize) => {
       primaryKey: true,
       allowNull: false,
     },
-    usuario_id: { 
-      type: DataTypes.INTEGER, 
+    usuario_uid: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      unique: true  // 👈 Para relación 1:1
+      references: {  // 👈 Referencia añadida
+        model: 'usuarios',
+        key: 'uid'
+      }
     },
     programa_formacion: { 
       type: DataTypes.STRING, 

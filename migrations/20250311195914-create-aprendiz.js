@@ -2,35 +2,35 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('aprendices', {  // 👈 Nombre de tabla en plural
-      aprendiz_id: {  // 👈 PK propia
+    await queryInterface.createTable('aprendices', {  // Nombre de tabla en plural
+      aprendiz_id: {  // PK propia
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
       },
-      usuario_id: {
-        type: Sequelize.INTEGER,
+      usuario_uid: {
+        type: Sequelize.STRING(28), // Cambiado a STRING(28) para que coincida con usuarios.uid
         allowNull: false,
-        unique: true,  // 👈 Relación 1:1
+        unique: true,  // Relación 1:1
         references: {
-          model: 'usuarios',  // 👈 Nombre de tabla referenciada
-          key: 'usuario_id'
+          model: 'usuarios',  // Nombre de tabla referenciada
+          key: 'uid'
         },
         onDelete: 'CASCADE'
       },
       programa_formacion: {
         type: Sequelize.STRING,
-        allowNull: false  // 👈 Coincide con el modelo
+        allowNull: false  // Coincide con el modelo
       },
       ficha: {
         type: Sequelize.INTEGER,
-        allowNull: false  // 👈 Coincide con el modelo
+        allowNull: false  // Coincide con el modelo
       },
       identificacion_sena: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true  // 👈 Restricción única
+        unique: true  // Restricción única
       },
       createdAt: {
         allowNull: false,
@@ -50,6 +50,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('aprendices');  // 👈 Nombre correcto
+    await queryInterface.dropTable('aprendices');  // Nombre correcto
   }
 };

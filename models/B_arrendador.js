@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
 
   Arrendador.init({
     uid: {
-      type: DataTypes.STRING(28), // 👈 Longitud fija de 28 caracteres
+      type: DataTypes.STRING(28), 
       allowNull: false,
       primaryKey: true,
       unique: true

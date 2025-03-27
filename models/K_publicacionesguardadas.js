@@ -17,12 +17,12 @@ module.exports = (sequelize) => {
         key: 'publicacion_id'
       }
     },
-    usuario_id: {
+    usuario_uid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'usuarios',
-        key: 'usuario_id'
+        key: 'uid'
       }
     }
   }, {

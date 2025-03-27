@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
       Publicacion.belongsToMany(models.Usuario, {
         through: 'publicaciones_guardadas',
         foreignKey: 'publicacion_id',
-        otherKey: 'usuario_id',  // 👈 Clave faltante
+        otherKey: 'usuario_uid',  // 👈 Clave faltante
         as: 'usuariosGuardaron'
       });
     }

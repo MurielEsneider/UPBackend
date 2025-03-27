@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
   class Cita extends Model {
     static associate(models) {
       Cita.belongsTo(models.Usuario, { 
-        foreignKey: 'usuario_id', 
+        foreignKey: 'usuario_uid', 
         as: 'usuario',
         onDelete: 'CASCADE' 
       });
@@ -23,12 +23,12 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
-    usuario_id: {
+    usuario_uid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {  // 👈 Referencia añadida
         model: 'usuarios',
-        key: 'usuario_id'
+        key: 'uid'
       }
     },
     propiedad_id: {

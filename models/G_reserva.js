@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
   class Reserva extends Model {
     static associate(models) {
       Reserva.belongsTo(models.Usuario, { 
-        foreignKey: 'usuario_id', 
+        foreignKey: 'usuario_uid', 
         onDelete: 'CASCADE',
         as: 'usuario'
       });
@@ -30,12 +30,12 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    usuario_id: {
+    usuario_uid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {  // 👈 Referencia añadida
         model: 'usuarios',
-        key: 'usuario_id'
+        key: 'uid'
       }
     },
     propiedad_id: {

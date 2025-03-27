@@ -18,19 +18,19 @@ module.exports = {
         },
         onDelete: 'CASCADE'
       },
-      usuario_id: {
-        type: Sequelize.INTEGER,
+      usuario_uid: {
+        type: Sequelize.STRING(28),
         allowNull: false,
         references: {
           model: 'usuarios',
-          key: 'usuario_id'
+          key: 'uid'
         },
         onDelete: 'CASCADE'
       }
     });
 
     // Índice único para evitar duplicados
-    await queryInterface.addIndex('publicaciones_guardadas', ['publicacion_id', 'usuario_id'], {
+    await queryInterface.addIndex('publicaciones_guardadas', ['publicacion_id', 'usuario_uid'], {
       unique: true,
       name: 'idx_unique_publicacion_usuario'
     });

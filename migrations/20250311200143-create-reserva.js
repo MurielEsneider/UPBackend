@@ -9,26 +9,26 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      usuario_id: {
-        type: Sequelize.INTEGER,
+      usuario_uid: {
+        type: Sequelize.STRING(28), // Cambiado a STRING(28) para ser compatible con usuarios.uid
         allowNull: false,
-        references: {  // 👈 Referencia añadida
+        references: {
           model: 'usuarios',
-          key: 'usuario_id'
+          key: 'uid'
         },
         onDelete: 'CASCADE'
       },
       propiedad_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {  // 👈 Referencia añadida
+        references: {
           model: 'propiedades',
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
       fecha_inicio: {
-        type: Sequelize.DATEONLY,  // 👈 Tipo corregido
+        type: Sequelize.DATEONLY,  // Tipo de fecha sin hora
         allowNull: false
       },
       fecha_fin: {
@@ -58,7 +58,7 @@ module.exports = {
     });
 
     // Índices para consultas frecuentes
-    await queryInterface.addIndex('reservas', ['usuario_id']);
+    await queryInterface.addIndex('reservas', ['usuario_uid']);
     await queryInterface.addIndex('reservas', ['propiedad_id']);
     await queryInterface.addIndex('reservas', ['estado']);
   },

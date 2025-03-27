@@ -3,18 +3,18 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('citas', {
-      cita_id: {  // 👈 Nombre consistente
+      cita_id: {  // Nombre consistente
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      usuario_id: {
-        type: Sequelize.INTEGER,
+      usuario_uid: {
+        type: Sequelize.STRING(28), // Cambiado a STRING(28) para ser compatible con usuarios.uid
         allowNull: false,
         references: {
           model: 'usuarios',
-          key: 'usuario_id'
+          key: 'uid'
         },
         onDelete: 'CASCADE'
       },
@@ -28,7 +28,7 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       fecha: {
-        type: Sequelize.DATEONLY,  // 👈 Tipo corregido
+        type: Sequelize.DATEONLY,  // Tipo corregido
         allowNull: false
       },
       hora: {
@@ -64,7 +64,7 @@ module.exports = {
     });
 
     // Índices para consultas comunes
-    await queryInterface.addIndex('citas', ['usuario_id']);
+    await queryInterface.addIndex('citas', ['usuario_uid']);
     await queryInterface.addIndex('citas', ['propiedad_id']);
     await queryInterface.addIndex('citas', ['fecha']);
   },

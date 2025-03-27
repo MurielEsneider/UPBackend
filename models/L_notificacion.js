@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Una notificación pertenece a un usuario
       Notificacion.belongsTo(models.Usuario, { 
-        foreignKey: 'usuario_id', 
+        foreignKey: 'usuario_uid', 
         as: 'usuario'
       });
 
@@ -27,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    usuario_id: {
+    usuario_uid: {
       type: DataTypes.INTEGER,
       allowNull: true, // Permitir nulo si es para un propietario
       references: {
         model: 'usuarios',
-        key: 'usuario_id'
+        key: 'uid'
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'

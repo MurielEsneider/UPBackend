@@ -17,12 +17,12 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
-      usuario_id: {
-        type: Sequelize.INTEGER,
+      usuario_uid: {
+        type: Sequelize.STRING(28),
         allowNull: false,
         references: {
           model: 'usuarios', // Debe existir la tabla Usuarios
-          key: 'usuario_id'
+          key: 'uid'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
