@@ -89,7 +89,7 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
-      vista_montaña: {
+      vista_montana: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },

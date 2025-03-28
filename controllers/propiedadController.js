@@ -6,7 +6,8 @@ const crearPropiedad = async (req, res) => {
   console.log("Iniciando creación de propiedad...");
 
   try {
-    const { titulo, descripcion, direccion, precio, arrendador_uid, imagenes } = req.body;
+    // Extraer lat y lng además de los demás campos
+    const { titulo, descripcion, direccion, precio, arrendador_uid, lat, lng, imagenes } = req.body;
 
     console.log("Datos recibidos en la solicitud:", {
       titulo,
@@ -14,13 +15,15 @@ const crearPropiedad = async (req, res) => {
       direccion,
       precio,
       arrendador_uid,
+      lat,
+      lng,
       imagenes
     });
 
     // Validar que los datos requeridos estén presentes
-    if (!titulo || !direccion || !precio || !arrendador_uid) {
+    if (!titulo || !direccion || !precio || !arrendador_uid || lat == null || lng == null) {
       console.error("Faltan datos requeridos en la solicitud.");
-      return res.status(400).json({ error: "Faltan datos requeridos" });
+      return res.status(400).json({ error: "Faltan datos requeridos. Se requieren título, dirección, precio, arrendador_uid, lat y lng." });
     }
 
     console.log("Creando propiedad en la base de datos...");
@@ -29,7 +32,9 @@ const crearPropiedad = async (req, res) => {
       descripcion,
       direccion,
       precio,
-      arrendador_uid
+      arrendador_uid,
+      lat, // Se envía la latitud
+      lng  // Se envía la longitud
     });
 
     // Si se envía un array de imágenes, creamos los registros asociados
@@ -180,7 +185,7 @@ const eliminarPropiedad = async (req, res) => {
       await transaction.rollback();
       return res.status(404).json({ 
         error: "Propiedad no encontrada",
-        details: `No existe una propiedad con ID: ${id}`
+        details: `No existe una propiedad con ID: ${id}` 
       });
     }
 
@@ -388,5 +393,3 @@ module.exports = {
   eliminarPropiedad,
   editarPropiedad
 };
-
-

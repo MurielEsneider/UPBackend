@@ -35,6 +35,15 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       },
+      // Nuevos campos para almacenar la ubicación
+      lat: {
+        type: Sequelize.FLOAT,
+        allowNull: false
+      },
+      lng: {
+        type: Sequelize.FLOAT,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

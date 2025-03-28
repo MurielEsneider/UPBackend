@@ -98,6 +98,23 @@ module.exports = (sequelize) => {
         }
       }
     },
+    // Nuevos campos para almacenar la ubicación
+    lat: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notNull: { msg: 'La latitud es requerida' },
+        isFloat: { msg: 'La latitud debe ser un número' }
+      }
+    },
+    lng: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notNull: { msg: 'La longitud es requerida' },
+        isFloat: { msg: 'La longitud debe ser un número' }
+      }
+    },
     arrendador_uid: {
       type: DataTypes.STRING,
       allowNull: false,

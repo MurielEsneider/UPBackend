@@ -58,7 +58,71 @@ module.exports = (sequelize) => {
         }
       }
     },
-    // ... (agregar validaciones similares para otros campos numéricos)
+    wifi: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    energia: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    tv: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    cocina: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    agua: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    garaje: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    lavadora: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    nevera: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    gas: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    estacionamientos: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: { min: 0 }
+    },
+    jardin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    piscina: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    vista_montana: { // ¡Nombre actualizado sin ñ!
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    terraza: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    amoblado: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    acepta_mascotas: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: "CaracteristicaPropiedad",
