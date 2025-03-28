@@ -389,10 +389,40 @@ const editarPropiedad = async (req, res) => {
   }
 };
 
+const getAllPropiedades = async (req, res) => {
+  try {
+    const propiedades = await Propiedad.findAll({
+      include: [
+        {
+          model: PropiedadImagen,
+          as: 'imagenes', // Asegúrate que este alias coincida con la asociación
+          attributes: ['url'],
+          limit: 1,
+          separate: true // Esto puede ayudar con el limit en asociaciones
+        }
+      ],
+      order: [['fecha_creacion', 'DESC']]
+    });
+
+    if (!propiedades || propiedades.length === 0) {
+      return res.status(404).json({ message: "No se encontraron propiedades" });
+    }
+
+    res.status(200).json(propiedades);
+  } catch (error) {
+    console.error("Error al obtener propiedades:", error);
+    res.status(500).json({ 
+      error: "Error interno del servidor",
+      details: error.message // Agrega esto para más detalles en desarrollo
+    });
+  }
+};
+
 module.exports = {
   crearPropiedad,
   getPropiedadesByArrendador,
   getPublicacion,
   eliminarPropiedad,
-  editarPropiedad
+  editarPropiedad,
+  getAllPropiedades
 };

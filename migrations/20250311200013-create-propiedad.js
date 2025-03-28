@@ -7,15 +7,21 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        comment: 'Identificador único de la propiedad'
       },
       titulo: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(100),
+        allowNull: false,
+        validate: {
+          len: [5, 100]
+        }
       },
       descripcion: {
         type: Sequelize.TEXT,
-        allowNull: true
+        validate: {
+          len: [0, 2000]
+        }
       },
       direccion: {
         type: Sequelize.STRING,
@@ -23,7 +29,10 @@ module.exports = {
       },
       precio: {
         type: Sequelize.DECIMAL(10, 2),
-        allowNull: false
+        allowNull: false,
+        validate: {
+          min: 0
+        }
       },
       arrendador_uid: {
         type: Sequelize.STRING,
@@ -35,14 +44,23 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       },
-      // Nuevos campos para almacenar la ubicación
       lat: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: false,
+        comment: 'Latitud geográfica'
       },
       lng: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: false,
+        comment: 'Longitud geográfica'
+      },
+      estado: {
+        type: Sequelize.ENUM('disponible', 'ocupado', 'mantenimiento'),
+        defaultValue: 'disponible'
+      },
+      habilitado: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         allowNull: false,
@@ -56,9 +74,12 @@ module.exports = {
       }
     });
 
-    // Índices para optimizar consultas
+    // Índices
     await queryInterface.addIndex('propiedades', ['arrendador_uid']);
     await queryInterface.addIndex('propiedades', ['precio']);
+    await queryInterface.addIndex('propiedades', ['lat', 'lng']);
+    await queryInterface.addIndex('propiedades', ['estado']);
+    await queryInterface.addIndex('propiedades', ['createdAt']);
   },
 
   async down(queryInterface, Sequelize) {

@@ -129,8 +129,10 @@ module.exports = (sequelize) => {
     sequelize,
     modelName: 'Propiedad',
     tableName: 'propiedades',
-    freezeTableName: true, // Evita que Sequelize pluralice el nombre de la tabla
-    timestamps: false      // Desactiva los campos `createdAt` y `updatedAt`
+    freezeTableName: true,
+    timestamps: true, // Cambia esto a true
+    createdAt: 'fecha_creacion', // Opcional: nombre personalizado
+    updatedAt: 'fecha_actualizacion' // Opcional: nombre personalizado
   });
 
   return Propiedad;

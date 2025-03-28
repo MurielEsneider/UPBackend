@@ -10,5 +10,6 @@ router.get('/propiedades/arrendador/:arrendador_uid', propertyController.getProp
 router.get('/propiedades/publicacion/:id', propertyController.getPublicacion);
 router.delete('/propiedades/:id', propertyController.eliminarPropiedad);    
 router.put('/propiedades/:id', propertyController.editarPropiedad); 
+router.get('/alojamientos', propertyController.getAllPropiedades);
 
 module.exports = router;
