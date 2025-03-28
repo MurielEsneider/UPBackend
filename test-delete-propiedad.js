@@ -1,8 +1,9 @@
+// testDelete.js
 const axios = require('axios');
 
 async function testDelete() {
-  const propiedadId = 20;
-  const arrendadorUid = "cjULhcpsxCQNkTpjK4GYWmQSzE43";
+  const propiedadId = 1;
+  const arrendadorUid = "G3XPtrivqxZDWN15AOuJvs7yHKJ2";
 
   try {
     console.log("🚀 Iniciando prueba de eliminación...");

@@ -1,6 +1,7 @@
+// controllers/propiedadController.js
 const { Propiedad, PropiedadImagen, CaracteristicaPropiedad } = require('../models');
 const { sequelize } = require('../models');
-const { bucket } = require('../config/firebaseAdmin'); // Importa el bucket para Firebase Storage
+const { admin, bucket } = require('../config/firebaseAdmin'); // Importa admin y bucket para Firebase Storage
 
 const crearPropiedad = async (req, res) => {
   console.log("Iniciando creación de propiedad...");
@@ -23,7 +24,9 @@ const crearPropiedad = async (req, res) => {
     // Validar que los datos requeridos estén presentes
     if (!titulo || !direccion || !precio || !arrendador_uid || lat == null || lng == null) {
       console.error("Faltan datos requeridos en la solicitud.");
-      return res.status(400).json({ error: "Faltan datos requeridos. Se requieren título, dirección, precio, arrendador_uid, lat y lng." });
+      return res.status(400).json({ 
+        error: "Faltan datos requeridos. Se requieren título, dirección, precio, arrendador_uid, lat y lng." 
+      });
     }
 
     console.log("Creando propiedad en la base de datos...");
@@ -198,8 +201,8 @@ const eliminarPropiedad = async (req, res) => {
       });
     }
 
-    // 4. Configuración de Firebase
-    const bucket = admin.storage().bucket("arrendamientos-80c2a.appspot.com");
+    // 4. Configuración de Firebase: usamos el bucket importado
+    // (No se vuelve a inicializar; ya está disponible desde firebaseAdmin)
 
     // 5. Eliminación de imágenes con manejo avanzado
     let deletedImages = 0;
