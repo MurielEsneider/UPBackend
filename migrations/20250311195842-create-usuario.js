@@ -9,7 +9,7 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      nombres_apellidos: {
+      nombre: {
         type: Sequelize.STRING, // Se puede ajustar la longitud si es necesario
         allowNull: false
       },

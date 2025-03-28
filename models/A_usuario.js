@@ -39,7 +39,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       unique: true
     },
-    nombres_apellidos: { 
+    nombre: { 
       type: DataTypes.STRING, 
       allowNull: false,
       validate: {
