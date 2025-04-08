@@ -58,6 +58,10 @@ module.exports = {
         type: Sequelize.ENUM('disponible', 'ocupado', 'mantenimiento'),
         defaultValue: 'disponible'
       },
+      views: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       habilitado: {
         type: Sequelize.BOOLEAN,
         defaultValue: true

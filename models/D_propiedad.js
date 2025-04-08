@@ -115,6 +115,10 @@ module.exports = (sequelize) => {
         isFloat: { msg: 'La longitud debe ser un número' }
       }
     },
+    views: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     arrendador_uid: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "root",
-    "password": "CTPI2025*",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "CTPI2025*",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "CTPI2025*",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"

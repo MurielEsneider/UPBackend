@@ -418,11 +418,31 @@ const getAllPropiedades = async (req, res) => {
   }
 };
 
+const incrementarVistas = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Incrementa el campo "views" en 1
+    const propiedad = await Propiedad.findByPk(id);
+    if (!propiedad) {
+      return res.status(404).json({ error: "Propiedad no encontrada" });
+    }
+    
+    propiedad.views += 1;
+    await propiedad.save();
+
+    // Puedes retornar el número actualizado de vistas si lo requieres
+    res.json({ views: propiedad.views });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   crearPropiedad,
   getPropiedadesByArrendador,
   getPublicacion,
   eliminarPropiedad,
   editarPropiedad,
-  getAllPropiedades
+  getAllPropiedades,
+  incrementarVistas
 };
