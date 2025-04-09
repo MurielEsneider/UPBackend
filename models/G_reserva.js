@@ -1,6 +1,5 @@
 'use strict';
 const { Model, DataTypes } = require('sequelize');
-
 module.exports = (sequelize) => {
   class Reserva extends Model {
     static associate(models) {
@@ -23,7 +22,6 @@ module.exports = (sequelize) => {
       });
     }
   }
-
   Reserva.init({
     reserva_id: {
       type: DataTypes.INTEGER,
@@ -31,9 +29,9 @@ module.exports = (sequelize) => {
       autoIncrement: true
     },
     usuario_uid: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      references: {  // 👈 Referencia añadida
+      references: {
         model: 'usuarios',
         key: 'uid'
       }
@@ -41,18 +39,22 @@ module.exports = (sequelize) => {
     propiedad_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {  // 👈 Referencia añadida
+      references: {
         model: 'propiedades',
         key: 'id'
       }
     },
     fecha_inicio: {
-      type: DataTypes.DATEONLY,  // 👈 Mejor tipo para fechas sin hora
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     fecha_fin: {
       type: DataTypes.DATEONLY,
       allowNull: false
+    },
+    hora_llegada: {
+      type: DataTypes.TIME,
+      allowNull: true
     },
     estado: {
       type: DataTypes.ENUM("pendiente", "confirmada", "cancelada"),
@@ -62,14 +64,7 @@ module.exports = (sequelize) => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       validate: {
-        min: 0.01  // 👈 Mínimo valor permitido
-      }
-    },
-    anticipo: {
-      type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
-      validate: {
-        min: 0
+        min: 0.01
       }
     },
     observaciones: {
@@ -87,6 +82,5 @@ module.exports = (sequelize) => {
     freezeTableName: true,
     timestamps: false
   });
-
   return Reserva;
 };

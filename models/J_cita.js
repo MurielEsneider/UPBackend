@@ -18,7 +18,7 @@ module.exports = (sequelize) => {
   }
 
   Cita.init({
-    cita_id: {  // 👈 Nombre consistente para PK
+    cita_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
@@ -26,7 +26,7 @@ module.exports = (sequelize) => {
     usuario_uid: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {  // 👈 Referencia añadida
+      references: {
         model: 'usuarios',
         key: 'uid'
       }
@@ -34,17 +34,17 @@ module.exports = (sequelize) => {
     propiedad_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {  // 👈 Referencia añadida
+      references: {
         model: 'propiedades',
         key: 'id'
       }
     },
     fecha: {
-      type: DataTypes.DATEONLY,  // 👈 Solo fecha sin hora
+      type: DataTypes.DATEONLY,
       allowNull: false,
       validate: {
         isDate: true,
-        isAfter: new Date().toISOString().split('T')[0]  // No fechas pasadas
+        isAfter: new Date().toISOString().split('T')[0]
       }
     },
     hora: {
@@ -57,29 +57,6 @@ module.exports = (sequelize) => {
     estado: {
       type: DataTypes.ENUM('pendiente', 'confirmada', 'cancelada'),
       defaultValue: 'pendiente'
-    },
-    reglas_departamento: {
-      type: DataTypes.TEXT,
-      validate: {
-        len: [0, 500]  // Máximo 500 caracteres
-      }
-    },
-    oferta: {
-      type: DataTypes.DECIMAL(10, 2),
-      validate: {
-        min: 0  // No valores negativos
-      }
-    },
-    contra_oferta: {
-      type: DataTypes.DECIMAL(10, 2),
-      validate: {
-        min: 0,
-        customValidator(value) {
-          if (value !== null && this.oferta === null) {
-            throw new Error('Debe existir una oferta previa para contraoferta');
-          }
-        }
-      }
     }
   }, {
     sequelize,
@@ -90,5 +67,4 @@ module.exports = (sequelize) => {
   });
 
   return Cita;
-};   
-
+};

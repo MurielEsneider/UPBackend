@@ -31,7 +31,7 @@ const createCita = async (req, res) => {
   }
 };
 
-// Actualizar una cita
+// Actualizar todos los campos de una cita
 const updateCita = async (req, res) => {
   try {
     const cita = await Cita.findByPk(req.params.id);
@@ -41,6 +41,34 @@ const updateCita = async (req, res) => {
     res.json(cita);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+// Aceptar una cita (cambiar estado a "confirmada")
+const aceptarCita = async (req, res) => {
+  try {
+    const cita = await Cita.findByPk(req.params.id);
+    if (!cita) return res.status(404).json({ error: 'Cita no encontrada' });
+
+    cita.estado = 'confirmada';
+    await cita.save();
+    res.json({ message: 'Cita aceptada', cita });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Cancelar una cita (cambiar estado a "cancelada")
+const cancelarCita = async (req, res) => {
+  try {
+    const cita = await Cita.findByPk(req.params.id);
+    if (!cita) return res.status(404).json({ error: 'Cita no encontrada' });
+
+    cita.estado = 'cancelada';
+    await cita.save();
+    res.json({ message: 'Cita cancelada', cita });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -62,5 +90,7 @@ module.exports = {
   getCitaById,
   createCita,
   updateCita,
+  aceptarCita,
+  cancelarCita,
   deleteCita
 };
