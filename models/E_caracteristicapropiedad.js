@@ -58,6 +58,16 @@ module.exports = (sequelize) => {
         }
       }
     },
+    capacidad: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: {
+          args: [0],
+          msg: "La capacidad no puede ser negativa"
+        }
+      }
+    },
     wifi: {
       type: DataTypes.BOOLEAN,
       defaultValue: false

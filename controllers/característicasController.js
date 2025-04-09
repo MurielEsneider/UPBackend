@@ -6,7 +6,6 @@ const createCaracteristica = async (req, res) => {
   
   try {
     const { propiedad_id, ...caracteristicas } = req.body;
-
     // Validar existencia de la propiedad
     const propiedad = await Propiedad.findByPk(propiedad_id, { transaction });
     if (!propiedad) {
@@ -14,7 +13,7 @@ const createCaracteristica = async (req, res) => {
       return res.status(404).json({ error: "Propiedad no encontrada" });
     }
 
-    // Crear características usando defaults del modelo
+    // Crear características usando defaults del modelo y el campo capacidad ya incluido
     const newCaracteristica = await CaracteristicaPropiedad.create(
       { propiedad_id, ...caracteristicas },
       { transaction }
@@ -49,6 +48,7 @@ const createCaracteristica = async (req, res) => {
     return res.status(500).json(responseError);
   }
 };
+
 
 module.exports = {
   createCaracteristica
