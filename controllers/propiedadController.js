@@ -418,22 +418,22 @@ const getAllPropiedades = async (req, res) => {
   }
 };
 
+// Endpoint para incrementar las vistas
 const incrementarVistas = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // id de la propiedad desde la URL
   try {
-    // Incrementa el campo "views" en 1
-    const propiedad = await Propiedad.findByPk(id);
-    if (!propiedad) {
-      return res.status(404).json({ error: "Propiedad no encontrada" });
-    }
+    // Incrementa el campo 'views' en 1 para la propiedad con ese id
+    await Propiedad.increment('views', { by: 1, where: { id } });
     
-    propiedad.views += 1;
-    await propiedad.save();
-
-    // Puedes retornar el número actualizado de vistas si lo requieres
-    res.json({ views: propiedad.views });
+    // Opcional: obtener el número actualizado de vistas
+    const propiedadActualizada = await Propiedad.findByPk(id, {
+      attributes: ['views']
+    });
+    
+    return res.status(200).json({ views: propiedadActualizada.views });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error al incrementar vistas:", error);
+    return res.status(500).json({ error: 'Error al incrementar vistas' });
   }
 };
 
