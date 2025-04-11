@@ -1,6 +1,7 @@
 // controllers/propiedadController.js
 const { Propiedad, PropiedadImagen, CaracteristicaPropiedad } = require('../models');
 const { sequelize } = require('../models');
+const { Op } = require('sequelize');
 const { admin, bucket } = require('../config/firebaseAdmin'); // Importa admin y bucket para Firebase Storage
 
 const crearPropiedad = async (req, res) => {
@@ -437,6 +438,39 @@ const incrementarVistas = async (req, res) => {
   }
 };
 
+
+/**
+ * Función que busca propiedades según un término de búsqueda.
+ * Se filtra por título y dirección utilizando una búsqueda insensible a mayúsculas/minúsculas.
+ */
+const search = async (req, res) => {
+  const searchQuery = req.query.q || '';
+  console.log('Término de búsqueda recibido:', searchQuery); // Verifica el valor
+
+  try {
+    const propiedades = await Propiedad.findAll({
+      where: {
+        [Op.or]: [
+          // Búsqueda insensible a mayúsculas/minúsculas para MySQL
+          sequelize.where(
+            sequelize.fn('LOWER', sequelize.col('titulo')),
+            { [Op.like]: `%${searchQuery.toLowerCase()}%` }
+          ),
+          sequelize.where(
+            sequelize.fn('LOWER', sequelize.col('direccion')),
+            { [Op.like]: `%${searchQuery.toLowerCase()}%` }
+          )
+        ]
+      }
+    });
+
+    return res.json({ data: propiedades });
+  } catch (error) {
+    console.error('Error en el controlador de búsqueda:', error);
+    return res.status(500).json({ error: 'Error al realizar la búsqueda' });
+  }
+};
+
 module.exports = {
   crearPropiedad,
   getPropiedadesByArrendador,
@@ -444,5 +478,6 @@ module.exports = {
   eliminarPropiedad,
   editarPropiedad,
   getAllPropiedades,
-  incrementarVistas
+  incrementarVistas,
+  search
 };
