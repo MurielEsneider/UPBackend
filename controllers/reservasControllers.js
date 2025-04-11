@@ -21,10 +21,44 @@ exports.crearReserva = async (req, res) => {
       hora_llegada,
       monto_reserva,
       observaciones,
-      estado: 'pendiente' // Estado inicial por defecto
+      estado: 'pendiente'
     });
 
     res.status(201).json(nuevaReserva);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Confirmar una reserva
+exports.aceptarReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reserva = await Reserva.findByPk(id);
+    if (!reserva) {
+      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
+    }
+
+    await reserva.update({ estado: 'confirmada' });
+    res.json({ mensaje: 'Reserva confirmada', reserva });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Cancelar una reserva
+exports.cancelarReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reserva = await Reserva.findByPk(id);
+    if (!reserva) {
+      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
+    }
+
+    await reserva.update({ estado: 'cancelada' });
+    res.json({ mensaje: 'Reserva cancelada', reserva });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -70,57 +104,6 @@ exports.obtenerReservaPorId = async (req, res) => {
   }
 };
 
-// Actualizar una reserva
-exports.actualizarReserva = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const reserva = await Reserva.findByPk(id);
-    if (!reserva) {
-      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
-    }
-
-    await reserva.update(req.body);
-    res.json(reserva);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Aceptar una reserva
-exports.aceptarReserva = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const reserva = await Reserva.findByPk(id);
-    if (!reserva) {
-      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
-    }
-
-    await reserva.update({ estado: 'confirmada' });
-    res.json({ mensaje: 'Reserva confirmada', reserva });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Cancelar una reserva
-exports.cancelarReserva = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const reserva = await Reserva.findByPk(id);
-    if (!reserva) {
-      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
-    }
-
-    await reserva.update({ estado: 'cancelada' });
-    res.json({ mensaje: 'Reserva cancelada', reserva });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Obtener reservas por usuario
 exports.obtenerReservasPorUsuario = async (req, res) => {
   try {
@@ -156,28 +139,6 @@ exports.obtenerReservasPorPropiedad = async (req, res) => {
     });
 
     res.json(reservas);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Cambiar estado de una reserva manualmente
-exports.cambiarEstadoReserva = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { estado } = req.body;
-
-    if (!['pendiente', 'confirmada', 'cancelada'].includes(estado)) {
-      return res.status(400).json({ mensaje: 'Estado no válido' });
-    }
-
-    const reserva = await Reserva.findByPk(id);
-    if (!reserva) {
-      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
-    }
-
-    await reserva.update({ estado });
-    res.json(reserva);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
