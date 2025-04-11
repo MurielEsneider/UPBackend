@@ -12,6 +12,6 @@ router.delete('/propiedades/:id', propertyController.eliminarPropiedad);
 router.put('/propiedades/:id', propertyController.editarPropiedad); 
 router.get('/alojamientos', propertyController.getAllPropiedades);
 router.post("/propiedades/:id/vistas", propertyController.incrementarVistas);
-
+router.get("/propiedades/search", propertyController.search);
 
 module.exports = router;

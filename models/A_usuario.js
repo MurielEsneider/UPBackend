@@ -29,6 +29,12 @@ module.exports = (sequelize) => {
         foreignKey: "usuario_uid", 
         onDelete: "CASCADE" 
       });
+      this.belongsToMany(models.Propiedad, {
+        through: 'Favoritos',
+        foreignKey: 'usuario_uid',
+        as: 'favoritos',
+        onDelete: 'CASCADE'
+      });
     }
   }
 

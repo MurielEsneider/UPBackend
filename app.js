@@ -13,6 +13,7 @@ const caracteristicasRoutes = require('./routes/característicasController');
 const propiedadRoute = require('./routes/propiedadRoute');
 const imagenesRoutes = require('./routes/imagesRouter');
 const usuarioRoutes = require('./routes/usuarioRoutes')
+const favoriteRoutes = require('./routes/favoriteRoutes')
 
 
 
@@ -59,7 +60,9 @@ app.use('/api', notificacionesRoutes);
 app.use('/api', caracteristicasRoutes);
 app.use('/api', propiedadRoute);
 app.use('/api', imagenesRoutes);
-app.use('/api', usuarioRoutes)
+app.use('/api', usuarioRoutes);
+app.use('/api', favoriteRoutes)
+
 
 
 // Iniciar servidor
