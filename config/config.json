@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "root",
-    "password": "salas2004",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "salas2004",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "salas2004",
+    "password": "123454321",
     "database": "UrbanPoint",
     "host": "127.0.0.1",
     "dialect": "mysql"

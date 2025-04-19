@@ -9,9 +9,11 @@ router.get('/propiedades/arrendador/:arrendador_uid', propertyController.getProp
 // Obtiene una publicación específica (propiedad) por su ID:
 router.get('/propiedades/publicacion/:id', propertyController.getPublicacion);
 router.delete('/propiedades/:id', propertyController.eliminarPropiedad);    
-router.put('/propiedades/:id', propertyController.editarPropiedad); 
 router.get('/alojamientos', propertyController.getAllPropiedades);
 router.post("/propiedades/:id/vistas", propertyController.incrementarVistas);
 router.get("/propiedades/search", propertyController.search);
+router.put("/propiedades/edit/:id/", propertyController.editarDatosBasicos);
+router.put("/propiedades/editcaracteristicas/:id", propertyController.editarCaracteristicas);
+router.put("/propiedades/editimages/:id", propertyController.editarImagenes);
 
 module.exports = router;
