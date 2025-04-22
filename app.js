@@ -14,6 +14,8 @@ const propiedadRoute = require('./routes/propiedadRoute');
 const imagenesRoutes = require('./routes/imagesRouter');
 const usuarioRoutes = require('./routes/usuarioRoutes')
 const favoriteRoutes = require('./routes/favoriteRoutes')
+const resenaRoutes = require('./routes/resenasRoutes');
+const ofertasRoutes = require('./routes/ofertasRoutes');
 
 
 
@@ -62,6 +64,8 @@ app.use('/api', propiedadRoute);
 app.use('/api', imagenesRoutes);
 app.use('/api', usuarioRoutes);
 app.use('/api', favoriteRoutes)
+app.use('/api', resenaRoutes);
+app.use('/api', ofertasRoutes);
 
 
 

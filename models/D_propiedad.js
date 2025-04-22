@@ -52,6 +52,21 @@ module.exports = (sequelize) => {
         as: 'usuariosFavoritos',
         onDelete: 'CASCADE'
       });
+
+      // Relación con Resena
+      Propiedad.hasMany(models.Resena, {
+        foreignKey: 'propiedad_id',
+        as: 'resenas',
+        onDelete: 'CASCADE'
+      });
+
+      // Relación 1:N con Ofertas
+      Propiedad.hasMany(models.Oferta, {
+        foreignKey: 'propiedad_id',
+        as: 'ofertas',
+        onDelete: 'CASCADE'
+      });
+
     }
   }
 

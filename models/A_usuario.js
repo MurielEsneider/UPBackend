@@ -1,3 +1,4 @@
+
 'use strict';
 const { Model, DataTypes } = require('sequelize');
 
@@ -8,7 +9,7 @@ module.exports = (sequelize) => {
       Usuario.hasOne(models.Aprendiz, { 
         foreignKey: "usuario_uid", 
         onDelete: "CASCADE", 
-        hooks: true  // Asegura eliminación en cascada a nivel de Sequelize
+        hooks: true  
       });
       Usuario.hasOne(models.Arrendador, { 
         foreignKey: "usuario_uid", 
@@ -29,12 +30,29 @@ module.exports = (sequelize) => {
         foreignKey: "usuario_uid", 
         onDelete: "CASCADE" 
       });
+
+      // Relación Muchos a Muchos (Favoritos)
       this.belongsToMany(models.Propiedad, {
         through: 'Favoritos',
         foreignKey: 'usuario_uid',
         as: 'favoritos',
         onDelete: 'CASCADE'
       });
+
+      // Relación 1:N con Reseñas
+      Usuario.hasMany(models.Resena, {
+        foreignKey: 'usuario_uid',
+        as: 'resenas',
+        onDelete: 'CASCADE'
+      });
+
+      // Relación 1:N con Ofertas
+      Usuario.hasMany(models.Oferta, {
+        foreignKey: 'usuario_uid',
+        as: 'ofertas',
+        onDelete: 'CASCADE'
+      });
+
     }
   }
 
@@ -48,31 +66,23 @@ module.exports = (sequelize) => {
     nombre: { 
       type: DataTypes.STRING, 
       allowNull: false,
-      validate: {
-        notEmpty: true  // Validación adicional
-      } 
+      validate: { notEmpty: true } 
     },
     fecha_nacimiento: { 
-      type: DataTypes.DATEONLY,  // 👈 Mejor usar DATEONLY para fechas sin hora
-      validate: {
-        isDate: true
-      }
+      type: DataTypes.DATEONLY,
+      validate: { isDate: true }
     },
     email: { 
       type: DataTypes.STRING(100), 
       allowNull: false, 
       unique: true,
-      validate: {
-        isEmail: true  // Valida formato de correo
-      }
+      validate: { isEmail: true }
     },
     fotoPerfil: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        isUrl: true  // Valida que sea una URL válida
-      }
-    },
+      validate: { isUrl: true }
+    }
   }, {
     sequelize,
     modelName: 'Usuario',
@@ -83,5 +93,3 @@ module.exports = (sequelize) => {
 
   return Usuario;
 };
-
-
